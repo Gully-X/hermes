@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import ar.com.odra.hermes.dto.ai.AIRequest;
 import ar.com.odra.hermes.dto.ai.AIResponse;
+import ar.com.odra.hermes.exception.AIClientException;
 import ar.com.odra.hermes.service.AIService;
 
 @WebMvcTest(AIController.class)
@@ -134,6 +136,35 @@ public class AIControllerTest {
 				verify(aiService)
 					.ask(any(AIRequest.class));
 		
+		
+	}
+	
+	// Test #21
+	
+	@Test
+	void shouldReturn503WhenAIClientFails() throws Exception {
+		
+		when(aiService.ask(any(AIRequest.class)))
+				.thenThrow(new AIClientException(
+						"No fue posible comunicarse con Ollama."
+						));
+		
+		mockMvc.perform(
+				post("/api/ai/ask")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{
+								"question": "¿Qué es Java?"
+							}
+							
+							
+							""")
+				)
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(jsonPath("$.code").value("AI_CLIENT_ERROR"))
+				.andExpect(jsonPath("$.message")
+						.value("No fue posible comunicarse con Ollama."));
+				
 		
 	}
 	

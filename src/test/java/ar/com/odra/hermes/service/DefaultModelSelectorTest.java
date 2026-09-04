@@ -25,6 +25,12 @@ public class DefaultModelSelectorTest {
 	private ModelSelectionStrategy strategy;
 	
 	@Mock
+	private ModelSelectionStrategy strategyA;
+	
+	@Mock
+	private ModelSelectionStrategy strategyB;
+	
+	@Mock
 	private AIRequest request;
 	
 	@Test
@@ -126,9 +132,41 @@ public class DefaultModelSelectorTest {
 		
 		// Verify
 		
-		verify(strategy).supports(request);
+		verify(strategy).selectModel(request);
 		
 		verify(strategy).supports(request);
+		
+		
+	}
+	
+	@Test
+	void siDosEstrategiasCoincidenGanaLaPrimera() {
+		
+		AIRequest request = new AIRequest("Crear en Java un poema taotista.");
+		
+		// Arrange
+		
+		DefaultModelSelector selector = new DefaultModelSelector(List.of(strategyA,strategyB));
+		
+		
+		when(strategyA.supports(request)).thenReturn(true);
+		
+		
+		
+		when(strategyA.selectModel(request)).thenReturn("qwen2.5:3b");
+		
+		
+		
+		// Act
+		
+		String model  = selector.selectModel(request);
+		
+		// Assert
+		
+		assertEquals("qwen2.5:3b", model);
+		
+		verify(strategyB, never()).supports(request);
+		verify(strategyB, never()).selectModel(request);
 		
 		
 	}
