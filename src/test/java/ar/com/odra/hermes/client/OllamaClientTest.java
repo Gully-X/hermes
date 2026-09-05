@@ -1,6 +1,7 @@
 package ar.com.odra.hermes.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -123,6 +124,52 @@ public class OllamaClientTest {
 				ollamaClient.generate(request);
 		
 		assertSame(response, result);
+	}
+	
+	@Test
+	void shouldThrowAIClientExceptionWhenOllamaReturnNUll() {
+		
+		OllamaGenerateRequest request =
+				new OllamaGenerateRequest(
+						"qwen2.5:3b",
+						"¿Qué es Java?",
+						false
+						);
+		
+	
+		
+		when(restClient.post())
+			.thenReturn(requestBodyUriSpec);
+		
+		when(requestBodyUriSpec.uri("/api/generate"))
+			.thenReturn(requestBodySpec);
+		
+		when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+			.thenReturn(requestBodySpec);
+		
+		when(requestBodySpec.retrieve())
+			.thenReturn(responseSpec);
+		
+		when(responseSpec.body(OllamaGenerateResponse.class))
+			.thenReturn(null);
+		
+		
+		
+		AIClientException exception = assertThrows(
+			    AIClientException.class,
+			    () -> ollamaClient.generate(request)
+			);
+		
+		assertEquals(
+				"No fue posible comunicarse con Ollama.", exception.getMessage()
+				);
+		
+		assertInstanceOf(
+				NullPointerException.class,
+				exception.getCause()
+				);
+		
+		
 	}
 	
 }
