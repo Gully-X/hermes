@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient;
 import ar.com.odra.hermes.dto.ai.OllamaGenerateRequest;
 import ar.com.odra.hermes.dto.ai.OllamaGenerateResponse;
 import ar.com.odra.hermes.exception.AIClientException;
+import ar.com.odra.hermes.exception.AIResponseException;
 
 @Service
 public class OllamaClient implements AIClient {
@@ -63,9 +64,18 @@ public class OllamaClient implements AIClient {
 		
 		logger.info("Respuesta recibida desde Ollama {} ms", fin - inicio);
 		
+		if (response.response() == null) {
+			// aqui debe ocurrir algo
+			throw new AIResponseException(
+					"Respuesta inválida recibido desde Ollama.", new IllegalStateException("El campo response es null.")
+					);
+		}
 		
 		
-		return response;
+		return response;		
+		
+		}catch (AIResponseException ex) {
+			throw ex;
 		
 		
 		} catch (Exception ex) {
@@ -80,9 +90,10 @@ public class OllamaClient implements AIClient {
 			throw new AIClientException("No fue posible comunicarse con Ollama.", ex);
 			
 		}
-				
+		
 	}
 
+	
 
 
 

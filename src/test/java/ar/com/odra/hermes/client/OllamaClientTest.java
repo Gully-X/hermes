@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClient;
 import ar.com.odra.hermes.dto.ai.OllamaGenerateRequest;
 import ar.com.odra.hermes.dto.ai.OllamaGenerateResponse;
 import ar.com.odra.hermes.exception.AIClientException;
+import ar.com.odra.hermes.exception.AIResponseException;
 
 @ExtendWith(MockitoExtension.class)
 public class OllamaClientTest {
@@ -111,6 +112,8 @@ public class OllamaClientTest {
 		when(requestBodyUriSpec.uri("/api/generate"))
 			.thenReturn(requestBodySpec);
 		
+		
+		
 		when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
 			.thenReturn(requestBodySpec);
 		
@@ -171,6 +174,103 @@ public class OllamaClientTest {
 		
 		
 	}
+	
+	// Test #25
+	@Test
+	void shouldThrowAIClientExceptionWhenOllamaResponseIsIncomplete() {
+		
+			OllamaGenerateRequest request = new OllamaGenerateRequest(
+					"qwen2.5:3b",
+					"¿Qué es Java?",
+					false
+					);
+			
+			
+			
+			
+			OllamaGenerateResponse response = new OllamaGenerateResponse(
+								"qwen2.5:3b",
+							    "2026-09-05T20:00:00Z",
+							    null,
+							    true,
+							    1000000L,
+							    100000L,
+							    5L,
+							    50000L,
+							    10L,
+							    800000L
+							  );
+			when(restClient.post())
+			    .thenReturn(requestBodyUriSpec);
+			
+			when(requestBodyUriSpec.uri("/api/generate"))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.retrieve())
+				.thenReturn(responseSpec);
+			
+			when(responseSpec.body(OllamaGenerateResponse.class))
+				.thenReturn(response);
+			
+			AIClientException exception = assertThrows(
+					AIClientException.class, () -> ollamaClient.generate(request)
+ 				);
+	}
+	
+	// Test #26
+	@Test 
+	void shouldThrowAIResponseExceptionWhenOllamaResponseIsIncomplete() {
+		
+		OllamaGenerateRequest request = new OllamaGenerateRequest(
+				"qwen2.5:3b",
+				"¿Qué es Java?",
+				false
+				
+				);
+		
+		OllamaGenerateResponse response = new OllamaGenerateResponse (
+				
+				"qwen2.5:3b",
+				"206-0805t20:00:00Z",
+				 null,
+				    true,
+				    1000000L,
+				    100000L,
+				    5L,
+				    50000L,
+				    10L,
+				    800000L
+		   
+				);
+	
+		when(restClient.post())
+			.thenReturn(requestBodyUriSpec);
+		
+		when(requestBodyUriSpec.uri("/api/generate"))
+			.thenReturn(requestBodySpec);
+		
+		when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+			.thenReturn(requestBodySpec);
+		
+		when(requestBodySpec.retrieve())
+			.thenReturn(responseSpec);
+		
+		when(responseSpec.body(OllamaGenerateResponse.class))
+			.thenReturn(response);
+		
+		AIResponseException exception = assertThrows(
+				
+				AIResponseException.class,
+				() -> ollamaClient.generate(request)				
+				);
+		
+		
+		
+	}
+	
 	
 }
 
