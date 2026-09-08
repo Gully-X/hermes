@@ -220,7 +220,7 @@ public class OllamaClientTest {
  				);
 	}
 	
-	// Test #26
+	// Test #26 & 27
 	@Test 
 	void shouldThrowAIResponseExceptionWhenOllamaResponseIsIncomplete() {
 		
@@ -267,9 +267,21 @@ public class OllamaClientTest {
 				() -> ollamaClient.generate(request)				
 				);
 		
+		assertEquals(
+				
+				"Respuesta inválida recibido desde Ollama.", exception.getMessage()
+				
+				);
+		
+		assertEquals(
+				
+				"Respuesta inválida recibido desde Ollama.", exception.getMessage()
+				
+				);
 		
 		
 	}
+	
 	
 	
 }
