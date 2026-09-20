@@ -2,6 +2,7 @@ package ar.com.odra.hermes.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,7 @@ import ar.com.odra.hermes.dto.ai.AIResponse;
 import ar.com.odra.hermes.dto.ai.OllamaGenerateRequest;
 import ar.com.odra.hermes.dto.ai.OllamaGenerateResponse;
 import ar.com.odra.hermes.exception.AIClientException;
+import ar.com.odra.hermes.exception.AIResponseException;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultAIServiceTest {
@@ -172,7 +174,32 @@ public class DefaultAIServiceTest {
 		
 		
 	}
-
+	
+	// Test #28
+	@Test
+	void deberiaPropagarAIResponseException() {
+		
+		AIRequest request = new AIRequest("¿Qué es Java?");
+		
+		AIResponseException exception = new AIResponseException(
+				
+				"Respuesta inválida recibida desde Ollama.", new IllegalStateException("El campo response es null.")
+				
+				);
+		
+		when(aiClient.generate(any(OllamaGenerateRequest.class))).thenThrow(exception);
+		
+		
+		when(modelSelector.selectModel(request)).thenReturn("qwen2.5:3b");
+		
+		DefaultAIService service = new DefaultAIService(aiClient, modelSelector);
+		
+		AIResponseException thrown = assertThrows(AIResponseException.class, () -> service.ask(request));
+		
+		assertSame(exception, thrown);
+	}
+	
+		
 }
 
 

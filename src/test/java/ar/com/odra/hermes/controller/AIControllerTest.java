@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ar.com.odra.hermes.dto.ai.AIRequest;
 import ar.com.odra.hermes.dto.ai.AIResponse;
 import ar.com.odra.hermes.exception.AIClientException;
+import ar.com.odra.hermes.exception.AIResponseException;
 import ar.com.odra.hermes.service.AIService;
 
 @WebMvcTest(AIController.class)
@@ -168,7 +169,77 @@ public class AIControllerTest {
 		
 	}
 	
-}
+	
+	//Test29
+	@Test
+	void shouldReturn503WhenAIResponseIsInvalid() throws Exception {
+		
+		AIResponseException exception =
+		        new AIResponseException(
+		                "Respuesta inválida recibida desde Ollama.",
+		                new IllegalStateException("El campo response es null.")
+		        );
+
+		when(aiService.ask(any(AIRequest.class)))
+		        .thenThrow(exception);
+		
+		mockMvc.perform(
+				post("/api/ai/ask")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{
+								"question": "¿Qué es Java?"
+							}
+							""")
+				)
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(jsonPath("$.code").value("AI_CLIENT_ERROR"))
+				.andExpect(jsonPath("$.message").value("Respuesta inválida recibida desde Ollama."));
+		
+	}
+	
+	//Test30
+	@Test
+	void shouldReturnCompleteErrorResponseWhenAIResponseIsInvalid() throws Exception {
+		
+		AIResponseException exception = 
+				new AIResponseException("Respuesta inválida recibida desde Ollama.", new IllegalStateException());
+		
+		when(aiService.ask(any(AIRequest.class))).thenThrow(exception);
+		
+		mockMvc.perform(
+				post("/api/ai/ask")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{
+								"question":"¿Qué es Java?"
+							}
+							""")
+				)
+		
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(jsonPath("$.timestamp").exists())
+				.andExpect(jsonPath("$.status").value(503))
+				.andExpect(jsonPath("$.code").value("AI_CLIENT_ERROR"))
+				.andExpect(jsonPath("$.message").value("Respuesta inválida recibida desde Ollama."))
+				.andExpect(jsonPath("$.path").value("/api/ai/ask"));
+		
+		
+	}
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
