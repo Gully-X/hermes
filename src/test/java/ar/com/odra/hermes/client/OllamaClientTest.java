@@ -318,6 +318,54 @@ public class OllamaClientTest {
 			
 		}
 		
+		@Test
+		void shouldThrownAIClientExceptionWhenResponseDesearializationFails() {
+			
+			OllamaGenerateRequest request =
+					new OllamaGenerateRequest(
+							"qwen2.5:3b",
+							"¿Qué es Java?",
+							false
+							);
+			
+			when(restClient.post())
+				.thenReturn(requestBodyUriSpec);
+			
+			when(requestBodyUriSpec.uri("/api/generate"))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.retrieve())
+				.thenReturn(responseSpec);
+			
+			RuntimeException causa =
+					new RuntimeException(
+							"Error al deserializar respuesta de Ollama"
+							);
+			
+			when(responseSpec.body(OllamaGenerateResponse.class))
+				.thenThrow(causa);
+			
+			AIClientException exception = 
+					assertThrows(
+							AIClientException.class,
+							() -> ollamaClient.generate(request)
+ 							);
+			
+			assertEquals(
+					"No fue posible comunicarse con Ollama.",
+					exception.getMessage()
+					);
+			
+			assertEquals(causa, exception.getCause());
+					
+					
+			
+		}
+		
+		
 		
 		
 	}
