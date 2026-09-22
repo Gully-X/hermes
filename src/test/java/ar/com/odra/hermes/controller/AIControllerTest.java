@@ -226,6 +226,24 @@ public class AIControllerTest {
 		
 		
 	}
+	
+	// Test 32
+	
+	@Test
+	void deberiaResponder400CuandoLaPreguntaNoEstáPresente() throws Exception {
+		
+		mockMvc.perform(
+				post("/api/ai/ask")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{}
+						""")
+				)
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+		.andExpect(jsonPath("$.message").value("La pregunta no puede estar vacía."))
+		.andExpect(jsonPath("$.path").value("/api/ai/ask"));
+	}
  }
 
 

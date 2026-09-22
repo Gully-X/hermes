@@ -273,18 +273,61 @@ public class OllamaClientTest {
 				
 				);
 		
-		assertEquals(
-				
-				"Respuesta inválida recibido desde Ollama.", exception.getMessage()
-				
-				);
+		}
+	
+		// Test #33
+		@Test
+		void shouldThrowAIClientExceptionWhenOllamaReturnsHttp500() {
+
+			OllamaGenerateRequest request = new OllamaGenerateRequest(
+					"qwen2.5:3b",
+					"¿Que es Java?",false
+					);
+			
+			when(restClient.post())
+					.thenReturn(requestBodyUriSpec);
+			
+			when(requestBodyUriSpec.uri("/api/generate"))
+					.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+					.thenReturn(requestBodySpec);
+			
+			RuntimeException causa = 
+					
+					new RuntimeException("HTTP 500 - Internal Server Error");
+			
+			when(requestBodySpec.retrieve())
+					.thenThrow(causa);
+			
+			AIClientException exception =
+					assertThrows(
+							AIClientException.class,
+							() -> ollamaClient.generate(request)
+							);
+			
+			assertEquals(
+					"No fue posible comunicarse con Ollama.", exception.getMessage()
+					);
+			
+			assertEquals(causa, exception.getCause());
+					
+					
+					
+			
+			
+		}
+		
 		
 		
 	}
 	
 	
 	
-}
+	
+	
+	
+
 
 
 

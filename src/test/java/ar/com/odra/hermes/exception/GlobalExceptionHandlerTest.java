@@ -62,6 +62,39 @@ public class GlobalExceptionHandlerTest {
 		
 	}
 	
+	//Test31
+	@Test
+	void deberiaConstruirErrorDtoParaUnaExcepcionDelClienteAI() {
+		
+		// Arrange
+		
+		GlobalExceptionHandler handler = new GlobalExceptionHandler();
+		
+		AIClientException exception = 
+				new AIClientException("No fue posible comunicarse con Ollama.");
+		
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		
+		when(request.getRequestURI()).thenReturn("/api/ai/ask");
+		
+		// Act
+		
+		var response = handler.handleAIClientException(exception, request);
+		
+		// Assert
+		
+		assertEquals(503, response.getStatusCode().value());
+		
+		ErrorDTO error = response.getBody();
+		
+		assertEquals("AI_CLIENT_ERROR", error.code());
+		
+		assertEquals("No fue posible comunicarse con Ollama.", error.message());
+		
+		assertEquals("/api/ai/ask", error.path());
+		
+	}
+	
 	
 }
 
