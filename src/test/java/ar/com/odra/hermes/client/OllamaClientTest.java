@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -365,10 +366,282 @@ public class OllamaClientTest {
 			
 		}
 		
+		//Test #36
+		@Test
+		void deberiaUsarElEndpointCorrectoDeOllama() {
+			
+			// Arrange
+			OllamaGenerateRequest request =
+					new OllamaGenerateRequest(
+							"qwen2.5:3b",
+							"¿Qué es Java?",
+							false
+							);
+			
+			OllamaGenerateResponse response =
+					new OllamaGenerateResponse(
+							"qwen2.5:3b",
+				            "2026-09-22T00:00:00Z",
+				            "Java es un lenguaje de programación.",
+				            true,
+				            1000000L,
+				            100000L,
+				            10L,
+				            200000L,
+				            20L,
+				            700000L
+						);
+			
+			when(restClient.post())
+				.thenReturn(requestBodyUriSpec);
+			
+			when(requestBodyUriSpec.uri("/api/generate"))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.retrieve())
+				.thenReturn(responseSpec);
+			
+			when(responseSpec.body(OllamaGenerateResponse.class))
+				.thenReturn(response);
+			
+			// Act
+			
+			ollamaClient.generate(request);
+			
+			// Assert
+			
+			verify(requestBodyUriSpec).uri("/api/generate");
+			
+			
+		}
 		
+		//Test #37
+		void deberiaUsarMetodoPostParaComunicarseConOllama() {
+			
+			// Arrange
+			OllamaGenerateRequest request =
+					new OllamaGenerateRequest(
+							"qwen2.5:3b",
+							"¿Qué es Java?",
+							false
+							);
+			
+			OllamaGenerateResponse response =
+					new OllamaGenerateResponse(
+							"qwen2.5:3b",
+				            "2026-09-22T00:00:00Z",
+				            "Java es un lenguaje de programación.",
+				            true,
+				            1000000L,
+				            100000L,
+				            10L,
+				            200000L,
+				            20L,
+				            700000L
+						);
+			
+			when(restClient.post())
+				.thenReturn(requestBodyUriSpec);
+			
+			when(requestBodyUriSpec.uri("/api/generate"))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.retrieve())
+				.thenReturn(responseSpec);
+			
+			when(responseSpec.body(OllamaGenerateResponse.class))
+				.thenReturn(response);
+			
+			// Act
+			
+			ollamaClient.generate(request);
+			
+			// Assert
+			
+			verify(restClient).post();
+			
+		}
 		
+	//Test #38
+		
+	void deberiaEnviarElRequestRecibidoA_Ollama() {
+		
+		// Arrange
+					OllamaGenerateRequest request =
+							new OllamaGenerateRequest(
+									"qwen2.5:3b",
+									"¿Qué es Java?",
+									false
+									);
+					
+					OllamaGenerateResponse response =
+							new OllamaGenerateResponse(
+									"qwen2.5:3b",
+						            "2026-09-22T00:00:00Z",
+						            "Java es un lenguaje de programación.",
+						            true,
+						            1000000L,
+						            100000L,
+						            10L,
+						            200000L,
+						            20L,
+						            700000L
+								);
+					
+					when(restClient.post())
+						.thenReturn(requestBodyUriSpec);
+					
+					when(requestBodyUriSpec.uri("/api/generate"))
+						.thenReturn(requestBodySpec);
+					
+					when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+						.thenReturn(requestBodySpec);
+					
+					when(requestBodySpec.retrieve())
+						.thenReturn(responseSpec);
+					
+					when(responseSpec.body(OllamaGenerateResponse.class))
+						.thenReturn(response);
+					
+					// Act
+					
+					ollamaClient.generate(request);
+					
+					// Assert
+					
+					verify(requestBodySpec).body(request);
+					
+	}
+	
+	// Test #39
+	void deberiaSolicitarUnaRespuestaDeTipoOllamaGenerateResponse() {
+		
+		// Arrange
+		OllamaGenerateRequest request =
+				new OllamaGenerateRequest(
+						"qwen2.5:3b",
+						"¿Qué es Java?",
+						false
+						);
+		
+		OllamaGenerateResponse response =
+				new OllamaGenerateResponse(
+						"qwen2.5:3b",
+			            "2026-09-22T00:00:00Z",
+			            "Java es un lenguaje de programación.",
+			            true,
+			            1000000L,
+			            100000L,
+			            10L,
+			            200000L,
+			            20L,
+			            700000L
+					);
+		
+		when(restClient.post())
+			.thenReturn(requestBodyUriSpec);
+		
+		when(requestBodyUriSpec.uri("/api/generate"))
+			.thenReturn(requestBodySpec);
+		
+		when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+			.thenReturn(requestBodySpec);
+		
+		when(requestBodySpec.retrieve())
+			.thenReturn(responseSpec);
+		
+		when(responseSpec.body(OllamaGenerateResponse.class))
+			.thenReturn(response);
+		
+		// Act
+		
+		ollamaClient.generate(request);
+		
+		// Assert
+		
+		verify(responseSpec).body(OllamaGenerateResponse.class);
 		
 	}
+		
+		//Test #40
+		@Test
+		void deberiaDevolverLaRespuestaDeOllama() {
+			
+			// Arrange
+			OllamaGenerateRequest request =
+					new OllamaGenerateRequest(
+							"qwen2.5:3b",
+							"¿Qué es Java?",
+							false
+							);
+			
+			OllamaGenerateResponse response =
+					new OllamaGenerateResponse(
+							"qwen2.5:3b",
+				            "2026-09-22T00:00:00Z",
+				            "Java es un lenguaje de programación.",
+				            true,
+				            1000000L,
+				            100000L,
+				            10L,
+				            200000L,
+				            20L,
+				            700000L
+						);
+			
+			when(restClient.post())
+				.thenReturn(requestBodyUriSpec);
+			
+			when(requestBodyUriSpec.uri("/api/generate"))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.body(any(OllamaGenerateRequest.class)))
+				.thenReturn(requestBodySpec);
+			
+			when(requestBodySpec.retrieve())
+				.thenReturn(responseSpec);
+			
+			when(responseSpec.body(OllamaGenerateResponse.class))
+				.thenReturn(response);
+			
+			// Act
+			
+			OllamaGenerateResponse resultado =
+					ollamaClient.generate(request);
+			
+			// Assert
+			assertEquals(
+					"qwen2.5:3b",
+					resultado.model()
+			);
+			
+			assertEquals(
+					"Java es un lenguaje de programación.",
+					resultado.response()
+					);
+			
+			assertEquals(
+					true,
+					resultado.done()
+					);
+			
+			
+		}
+		
+	
+		
+		
+		
+		
+		
+		
+}
 	
 	
 	

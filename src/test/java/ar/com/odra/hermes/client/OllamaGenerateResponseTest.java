@@ -4,11 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import ar.com.odra.hermes.dto.ai.OllamaGenerateResponse;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-import ar.com.odra.hermes.dto.ai.OllamaGenerateResponse;
-import tools.jackson.databind.ObjectMapper;
 
 public class OllamaGenerateResponseTest {
 
